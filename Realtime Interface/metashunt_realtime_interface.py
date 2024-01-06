@@ -49,6 +49,7 @@ def display_how_to_use():
     print("To use, follow these rules:")
     print("python metashunt_realtime_interface.py h --- Provides helpful information")
     print("python metashunt_realtime_interface.py s [measurement_time_seconds] --- Get streaming data, by default for 10 seconds")
+    print("python metashunt_realtime_interface.py l [measurement_time_seconds] [CSV_file_name] --- Log streaming data, by default for 10 seconds")
     print("Note: Burst measurements up to 25.5kHz")
     print("python metashunt_realtime_interface.py b rate_hz --- Burst reads 32,000 samples immediately")
     print("python metashunt_realtime_interface.py b rate_hz r current_level_uA --- Burst reads 32,000 samples once current rises over the specified level")
@@ -88,7 +89,7 @@ if __name__ == "__main__":
 
     if(len(sys.argv) > 1):
         command_character = sys.argv[1]
-        if command_character == 's':
+        if command_character == 's' or command_character == 'l':
             print("Streaming data")
             if len(sys.argv) > 2:
                 run_time = float(sys.argv[2])
@@ -185,6 +186,16 @@ if __name__ == "__main__":
     current_ua = np.array([m.current_ma * 1000.0 for m in measurements])
 
     print("Mean current: {}uA ".format(np.mean(current_ua)))
+
+    if command_character == 'l':
+        if len(sys.argv) > 3:
+            csv_filename = sys.argv[3]
+            csv_output = np.transpose(np.array([times, current_ua]))
+            np.savetxt(csv_filename, csv_output, header='time [us], current [uA]')
+        else:
+            print("Please provide a CSV file name")
+            display_how_to_use()
+            exit()
 
     fig, ax = plt.subplots()
     ax.plot(times_s, current_ua, '.-',label='Current')
