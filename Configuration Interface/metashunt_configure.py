@@ -5,6 +5,7 @@ import sys
 import time
 import serial.tools.list_ports
 import json
+import math
 
 config_index_dict = {
     "R6" : 0,
@@ -40,12 +41,15 @@ def get_packet(ser, start_time, timeout):
         if(step == 0 and data == 0xAA):
             step += 1
             chk = 0
-        if(step == 1 and data == 0x04):
+        elif(step == 1 and data == 0x04):
             step += 1
             chk += data
             chk &= 0xFF
             payload = []
             count = 0
+        elif(step == 1 and data != 0x04):
+            # Not a correct message, so reset
+            step = 0
         elif(step == 2):
             if(count < 5):
                 payload.append(data)
@@ -58,9 +62,6 @@ def get_packet(ser, start_time, timeout):
             if(data == chk):
                 return payload
             else:
-                print("Checksum wrong")
-                print(data)
-                print(chk)
                 step = 0
                 count = 0
 
@@ -90,7 +91,7 @@ if __name__ == "__main__":
         config_data = json.load(f)
 
         for key in config_data:
-            time.sleep(0.1)
+            time.sleep(0.05)
             # Send data
             print("Setting resistor {0} to {1} Ohm".format(key, config_data[key]))
 
@@ -102,7 +103,7 @@ if __name__ == "__main__":
             payload.append(chk)
             ser.write(bytearray(payload))
 
-            time.sleep(0.1)
+            time.sleep(0.05)
             # Request data
             payload = bytearray(struct.pack("<BBBB",0xAA,3,1,config_index_dict[key]))
             chk = 0
@@ -110,10 +111,12 @@ if __name__ == "__main__":
                 chk += payload[i]
                 chk &= 0xFF
             payload.append(chk)
+            ser.reset_input_buffer()
             ser.write(bytearray(payload))
+            ser.reset_input_buffer()
 
             # Get the response
-            payload = get_packet(ser, time.time(), 0.25)
+            payload = get_packet(ser, time.time(), 0.05)
             if payload:
                 # unpack it
                 line_spec = "<Bf"
@@ -121,11 +124,14 @@ if __name__ == "__main__":
                 index = info[0]
                 value = info[1]
 
-                if index == config_index_dict[key] and value == config_data[key]:
+                if index == config_index_dict[key] and math.isclose(value, config_data[key], rel_tol=1e-5):
                     print("Configuration Set Correctly")
                 else:
                     print("Received back {} index and {} Ohm".format(index, value))
+                    print("Should be {} index and {} Ohm".format(config_index_dict[key], config_data[key]))
                     print("Configuration Failed")
+            else:
+                print("Nothing heard back...")
 
 
         f.close()
