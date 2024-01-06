@@ -91,7 +91,7 @@ if __name__ == "__main__":
         config_data = json.load(f)
 
         for key in config_data:
-            time.sleep(0.05)
+            time.sleep(0.1)
             # Send data
             print("Setting resistor {0} to {1} Ohm".format(key, config_data[key]))
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
             payload.append(chk)
             ser.write(bytearray(payload))
 
-            time.sleep(0.05)
+            time.sleep(0.1)
             # Request data
             payload = bytearray(struct.pack("<BBBB",0xAA,3,1,config_index_dict[key]))
             chk = 0
@@ -116,7 +116,7 @@ if __name__ == "__main__":
             ser.reset_input_buffer()
 
             # Get the response
-            payload = get_packet(ser, time.time(), 0.05)
+            payload = get_packet(ser, time.time(), 0.15)
             if payload:
                 # unpack it
                 line_spec = "<Bf"
@@ -131,7 +131,7 @@ if __name__ == "__main__":
                     print("Should be {} index and {} Ohm".format(config_index_dict[key], config_data[key]))
                     print("Configuration Failed")
             else:
-                print("Nothing heard back...")
+                print("ERROR ************** Nothing heard back ************** ERROR")
 
 
         f.close()
