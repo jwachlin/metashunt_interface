@@ -103,7 +103,7 @@ if __name__ == "__main__":
                 if payload:
                     # unpack it
                     line_spec = "<If"
-                    info = struct.unpack(line_spec, array.array('B',payload).tostring())
+                    info = struct.unpack(line_spec, array.array('B',payload).tobytes())
                     measurements.append(MEASUREMENT(time=info[0],current_ma=info[1]))
         elif command_character == 'b':
             command_burst = 1
@@ -161,7 +161,7 @@ if __name__ == "__main__":
                 if payload:
                     # unpack it
                     line_spec = "<If"
-                    info = struct.unpack(line_spec, array.array('B',payload).tostring())
+                    info = struct.unpack(line_spec, array.array('B',payload).tobytes())
                     measurements.append(MEASUREMENT(time=info[0],current_ma=info[1]))
                     data_received = data_received + 1
         elif command_character == 'h':
