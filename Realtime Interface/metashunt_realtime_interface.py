@@ -191,7 +191,7 @@ if __name__ == "__main__":
         if len(sys.argv) > 3:
             csv_filename = sys.argv[3]
             csv_output = np.transpose(np.array([times, current_ua]))
-            np.savetxt(csv_filename, csv_output, header='time [us], current [uA]')
+            np.savetxt(csv_filename, csv_output, header='time [us], current [uA]', delimiter = ", ", comments='')
         else:
             print("Please provide a CSV file name")
             display_how_to_use()
