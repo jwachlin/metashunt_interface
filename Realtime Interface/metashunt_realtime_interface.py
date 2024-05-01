@@ -152,6 +152,7 @@ if __name__ == "__main__":
             ser.write(bytearray(payload))
 
             time.sleep(0.1)
+            ser.reset_input_buffer()
 
             # Get the data
             data_received = 0
