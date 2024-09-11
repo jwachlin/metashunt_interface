@@ -53,12 +53,11 @@ def display_how_to_use():
     print("python metashunt_realtime_interface.py h --- Provides helpful information")
     print("python metashunt_realtime_interface.py s [measurement_time_seconds] --- Get streaming data, by default for 10 seconds")
     print("python metashunt_realtime_interface.py l [measurement_time_seconds] [CSV_file_name] --- Log streaming data, by default for 10 seconds")
-    print("Note: Burst measurements up to 25.5kHz")
-    print("python metashunt_realtime_interface.py b rate_hz --- Burst reads 32,000 samples immediately")
-    print("python metashunt_realtime_interface.py b rate_hz r current_level_uA --- Burst reads 32,000 samples once current rises over the specified level")
-    print("python metashunt_realtime_interface.py b rate_hz f current_level_uA --- Burst reads 32,000 samples once current falls below the specified level")
-    print("python metashunt_realtime_interface.py b rate_hz s stage_index --- Burst reads 32,000 samples once system operates at specified stage index")
-    print("python metashunt_realtime_interface.py b rate_hz i --- Burst reads 32,000 samples once input IO rises. NOT SUPPORTED YET")
+    print("Note: Burst measurements up to 127.5kHz")
+    print("python metashunt_realtime_interface.py b rate_hz --- Burst reads 37,500 samples immediately")
+    print("python metashunt_realtime_interface.py b rate_hz r current_level_uA --- Burst reads 37,500 samples once current rises over the specified level")
+    print("python metashunt_realtime_interface.py b rate_hz f current_level_uA --- Burst reads 37,500 samples once current falls below the specified level")
+    print("python metashunt_realtime_interface.py b rate_hz s stage_index --- Burst reads 37,500 samples once system operates at specified stage index")
 
 if __name__ == "__main__":
 
@@ -87,8 +86,8 @@ if __name__ == "__main__":
     burst_rate = 1000
     trigger_level = 0
     trigger_id = 0
-    rate_100s_hz = 10
-    burst_number_measurements = 32000
+    rate_500s_hz = 10
+    burst_number_measurements = 37500
 
     if(len(sys.argv) > 1):
         command_character = sys.argv[1]
@@ -114,10 +113,14 @@ if __name__ == "__main__":
             command_burst = 1
             print("Burst read")
             if len(sys.argv) == 3:
-                rate_100s_hz = int(round(float(sys.argv[2]) / 100.0))
+                rate_500s_hz = int(round(float(sys.argv[2]) / 500.0))
+                print("Ideal rate: {0} Hz, Actual requested Rate: {1} Hz".format(float(sys.argv[2]), rate_500s_hz*500.0 ))
+                print("Actual measured rate will vary due to internal loop rate, but typically will exceed request")
                 trigger_id = 0
             elif len(sys.argv)== 5:
-                rate_100s_hz = int(round(float(sys.argv[2]) / 100.0))
+                rate_500s_hz = int(round(float(sys.argv[2]) / 500.0))
+                print("Ideal rate: {0} Hz, Actual requested Rate: {1} Hz".format(float(sys.argv[2]), rate_500s_hz*500.0 ))
+                print("Actual measured rate will vary due to internal loop rate, but typically will exceed request")
                 trig_type = sys.argv[3]
                 if trig_type == 'r':
                     print("Current rising")
@@ -142,12 +145,12 @@ if __name__ == "__main__":
                 display_how_to_use()
                 exit()
 
-            if rate_100s_hz > 255:
-                print("Burst rate must be less than 25.5kHz")
+            if rate_500s_hz > 255:
+                print("Burst rate must be less than 127.5kHz")
                 exit()
 
             # Assemble command and send
-            payload = [0xAA,command_burst,4,rate_100s_hz,trigger_id,((trigger_level & 0xFF00) >> 8),(trigger_level & 0x00FF )]
+            payload = [0xAA,command_burst,4,rate_500s_hz,trigger_id,((trigger_level & 0xFF00) >> 8),(trigger_level & 0x00FF )]
 
             chk = 0
             for i in range(1,len(payload)):
@@ -185,8 +188,9 @@ if __name__ == "__main__":
     print("Readings received: {}".format(len(measurements)))
 
     times = np.array([m.time for m in measurements])
-    times = times - times[0]
-    times_s = times / 1.0e6
+    # TODO handle overflow
+    times_us = (times - times[0]) / 4.0 # Data is in quarters of microseconds
+    times_s = times_us / 1.0e6 
 
     current_ma = np.array([m.current_ma for m in measurements])
     current_ua = np.array([m.current_ma * 1000.0 for m in measurements])
@@ -216,7 +220,7 @@ if __name__ == "__main__":
     # axma.grid()
 
     fig, axtm = plt.subplots()
-    axtm.plot(np.diff(times), '.-',label='Period')
+    axtm.plot(np.diff(times_us), '.-',label='Period')
     axtm.set(xlabel='Sample Index', ylabel='Period, us')
     axtm.legend()
     axtm.grid()
