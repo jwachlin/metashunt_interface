@@ -186,6 +186,7 @@ if __name__ == "__main__":
 
     times = np.array([m.time for m in measurements])
     times = times - times[0]
+    times = times * (2.0 / 2.333) # Adjust timing
     times_s = times / 1.0e6
 
     current_ma = np.array([m.current_ma for m in measurements])

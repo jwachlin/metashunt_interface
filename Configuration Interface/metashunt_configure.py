@@ -120,7 +120,7 @@ if __name__ == "__main__":
             if payload:
                 # unpack it
                 line_spec = "<Bf"
-                info = struct.unpack(line_spec, array.array('B',payload).tostring())
+                info = struct.unpack(line_spec, array.array('B',payload).tobytes())
                 index = info[0]
                 value = info[1]
 

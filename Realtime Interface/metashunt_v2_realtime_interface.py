@@ -50,14 +50,15 @@ def get_packet(ser, start_time, timeout):
 
 def display_how_to_use():
     print("To use, follow these rules:")
-    print("python metashunt_realtime_interface.py h --- Provides helpful information")
-    print("python metashunt_realtime_interface.py s [measurement_time_seconds] --- Get streaming data, by default for 10 seconds")
-    print("python metashunt_realtime_interface.py l [measurement_time_seconds] [CSV_file_name] --- Log streaming data, by default for 10 seconds")
+    print("python metashunt_realtime_v2_interface.py h --- Provides helpful information")
+    print("python metashunt_realtime_v2_interface.py s [measurement_time_seconds] --- Get streaming data, by default for 10 seconds")
+    print("python metashunt_realtime_v2_interface.py l [measurement_time_seconds] [CSV_file_name] --- Log streaming data, by default for 10 seconds")
     print("Note: Burst measurements up to 127.5kHz")
-    print("python metashunt_realtime_interface.py b rate_hz --- Burst reads 37,500 samples immediately")
-    print("python metashunt_realtime_interface.py b rate_hz r current_level_uA --- Burst reads 37,500 samples once current rises over the specified level")
-    print("python metashunt_realtime_interface.py b rate_hz f current_level_uA --- Burst reads 37,500 samples once current falls below the specified level")
-    print("python metashunt_realtime_interface.py b rate_hz s stage_index --- Burst reads 37,500 samples once system operates at specified stage index")
+    print("python metashunt_realtime_v2_interface.py b rate_hz --- Burst reads 37,500 samples immediately")
+    print("python metashunt_realtime_v2_interface.py b rate_hz r current_level_uA --- Burst reads 37,500 samples once current rises over the specified level")
+    print("python metashunt_realtime_v2_interface.py b rate_hz f current_level_uA --- Burst reads 37,500 samples once current falls below the specified level")
+    print("python metashunt_realtime_v2_interface.py b rate_hz s stage_index --- Burst reads 37,500 samples once system operates at specified stage index")
+    print("python metashunt_realtime_v2_interface.py b rate_hz i --- Burst reads 37,500 samples once KEY2 button is pressed")
 
 if __name__ == "__main__":
 
@@ -123,22 +124,30 @@ if __name__ == "__main__":
                 print("Actual measured rate will vary due to internal loop rate, but typically will exceed request")
                 trig_type = sys.argv[3]
                 if trig_type == 'r':
-                    print("Current rising")
+                    print("Current rising.")
                     trigger_id = 1
                     trigger_ua = float(sys.argv[4])
                     trigger_level = int(round(trigger_ua/5.0))
                 elif trig_type == 'f':
-                    print("Current falling")
+                    print("Current falling.")
                     trigger_id = 2
                     trigger_ua = float(sys.argv[4])
                     trigger_level = int(round(trigger_ua/5.0))
                 elif trig_type == 's':
-                    print("Stage level")
+                    print("Stage level.")
                     trigger_id = 3
                     trigger_level = int(sys.argv[4])
-                elif trig_type == 'i':
-                    print("Input trigger selected. This will be added in the future.")
+            elif len(sys.argv)== 4:
+                rate_500s_hz = int(round(float(sys.argv[2]) / 500.0))
+                print("Ideal rate: {0} Hz, Actual requested Rate: {1} Hz".format(float(sys.argv[2]), rate_500s_hz*500.0 ))
+                print("Actual measured rate will vary due to internal loop rate, but typically will exceed request")
+                trig_type = sys.argv[3]
+                if trig_type == 'i':
+                    print("Input trigger selected. Burst will begin when KEY2 is pressed.")
                     trigger_id = 4
+                else:
+                    print("With burst read, please provide a trigger type and rate")
+                    display_how_to_use()
                     exit()
             else:
                 print("With burst read, please provide a trigger type and rate")
@@ -200,7 +209,7 @@ if __name__ == "__main__":
     if command_character == 'l':
         if len(sys.argv) > 3:
             csv_filename = sys.argv[3]
-            csv_output = np.transpose(np.array([times, current_ua]))
+            csv_output = np.transpose(np.array([times_us, current_ua]))
             np.savetxt(csv_filename, csv_output, header='time [us], current [uA]', delimiter = ", ", comments='')
         else:
             print("Please provide a CSV file name")
@@ -219,15 +228,15 @@ if __name__ == "__main__":
     # axma.legend()
     # axma.grid()
 
-    fig, axtm = plt.subplots()
-    axtm.plot(np.diff(times_us), '.-',label='Period')
-    axtm.set(xlabel='Sample Index', ylabel='Period, us')
-    axtm.legend()
-    axtm.grid()
+    # fig, axtm = plt.subplots()
+    # axtm.plot(np.diff(times_us), '.-',label='Period')
+    # axtm.set(xlabel='Sample Index', ylabel='Period, us')
+    # axtm.legend()
+    # axtm.grid()
 
     fig, axfreq = plt.subplots()
-    axfreq.plot(np.divide(1.0,np.diff(times_s)), '.-',label='Frequency')
-    axfreq.set(xlabel='Sample Index', ylabel='Frequency, Hz')
+    axfreq.plot(times_s[1:], np.divide(1.0,np.diff(times_s)), '.-',label='Frequency')
+    axfreq.set(xlabel='Time, s', ylabel='Frequency, Hz')
     axfreq.legend()
     axfreq.grid()
 

@@ -2,13 +2,13 @@ import numpy as np
 import json
 import sys 
 
-V_bus = 4.947
+V_bus = 5.174
 
-lower_current_resistor_ohm = 22.05
-lower_current_measured_amp = 0.227
+lower_current_resistor_ohm = 21.9
+lower_current_measured_amp = 0.242
 
-higher_current_resistor_ohm = 11.10
-higher_current_measured_amp = 0.4741
+higher_current_resistor_ohm = 10.9
+higher_current_measured_amp = 0.505
 
 if(len(sys.argv) > 1):
     config_file_name = sys.argv[1]
