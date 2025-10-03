@@ -12,6 +12,8 @@ MetaShunt is a **precision current measurement tool** designed for analyzing ult
 * Real-time data visualization with GUI support
 * Python logging and scripting tools for use in automated testing
 
+<img width="653" height="435" alt="image" src="https://github.com/user-attachments/assets/b802d9b3-1cc1-40c4-8b2c-198d6b765890" />
+
 ---
 
 ## Installation
