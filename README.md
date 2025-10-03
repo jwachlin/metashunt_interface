@@ -24,9 +24,12 @@ MetaShunt is a **precision current measurement tool** designed for analyzing ult
    git clone https://github.com/jwachlin/metashunt_interface.git
    cd ./metashunt_interface
    ```
-2. Install Python dependencies as needed.
+2. Install Python dependencies.
 
-3. Connect MetaShunt to your computer via USB.
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Connect MetaShunt to your computer via USB.
 
 ---
 
