@@ -50,7 +50,7 @@ flat_pixels = [c / 255.0 for pixel in pixels for c in pixel]
 
 def find_metashunt_port():
     for comport in serial.tools.list_ports.comports():
-        if "STM" in comport.description:
+        if comport.vid == 1155 and comport.pid == 22336:
             return comport.device
     return None
 
