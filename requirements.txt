@@ -1,7 +1,6 @@
 dearpygui==2.0.0
-matplotlib==3.7.2
-numpy==1.24.3
-Pillow==10.0.1
-Pillow==11.3.0
-pyserial==3.5
-scipy==1.16.2
+matplotlib
+numpy
+Pillow
+pyserial
+scipy
