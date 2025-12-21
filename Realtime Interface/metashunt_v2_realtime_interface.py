@@ -67,7 +67,7 @@ if __name__ == "__main__":
     connected = [comport for comport in serial.tools.list_ports.comports()]
 
     for comport in connected:
-        if "STM" in comport[1]:
+        if comport.vid == 1155 and comport.pid == 22336:
             port = comport[0]
             break
 
