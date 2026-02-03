@@ -16,6 +16,8 @@ MetaShunt is a **precision current measurement tool** designed for analyzing ult
 
 ---
 
+There are two primary ways to interface with MetaShunt. If you have either a V1 or V2, and especially if you want a programmable interface, you can proceed with the following instructions for the Python interface. If you want the simplest interface for MetaShunt V2 with no install needed, and are on a Mac or Windows machine with Chrome or Edge, [visit the browser-based interface here!](https://jwachlin.github.io/metashunt-web-ui/)
+
 ## Installation
 
 1. Clone this repository:
@@ -67,7 +69,7 @@ python metashunt_realtime_v2_interface.py s 10
 
 ## Usage
 
-### Graphical Interface
+### Python-Based Graphical Interface
 
 * Displays **real-time current plots**
 * Zoom and pan to analyze low-power events
